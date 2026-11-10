@@ -1,115 +1,117 @@
 <main class="login-page">
   <!-- Panel de marca -->
-  <section class="brand-panel" aria-hidden="true">
+  <aside class="brand-panel" aria-hidden="true">
     <div class="brand">
-      <div class="brand-logo">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
           <path d="M14 2v6h6" />
           <path d="M8 13h8M8 17h5" />
         </svg>
-      </div>
+      </span>
       <span class="brand-name">PropTech Propi</span>
     </div>
 
-    <div class="brand-copy">
-      <h2>Tu facturación, clara y al día.</h2>
-      <p>Emite facturas, gestiona clientes y controla tus cobros desde un solo lugar.</p>
+    <div class="brand-body">
+      <h2>Facturación electrónica, clientes y cobros en un solo sistema.</h2>
+      <ul class="modules">
+        <li>Facturas</li>
+        <li>Notas de crédito y débito</li>
+        <li>Clientes</li>
+        <li>Productos y servicios</li>
+        <li>Impuestos</li>
+      </ul>
+
+      <!-- Vista previa de una factura -->
+      <div class="invoice">
+        <div class="invoice-head">
+          <div>
+            <span class="eyebrow">Factura electrónica</span>
+            <strong class="mono">FE-000128</strong>
+          </div>
+          <span class="badge">Pagada</span>
+        </div>
+        <dl class="invoice-lines">
+          <div><dt>Servicio de consultoría</dt><dd class="mono">₡ 150.000,00</dd></div>
+          <div><dt>Licencia mensual</dt><dd class="mono">₡ 65.000,00</dd></div>
+          <div class="tax"><dt>IVA 13 %</dt><dd class="mono">₡ 27.950,00</dd></div>
+        </dl>
+        <div class="invoice-total">
+          <span>Total</span>
+          <strong class="mono">₡ 242.950,00</strong>
+        </div>
+      </div>
     </div>
 
-    <!-- Factura ilustrativa -->
-    <div class="invoice-card">
-      <div class="invoice-head">
-        <span class="invoice-title">Factura #000128</span>
-        <span class="badge">Pagada</span>
-      </div>
-      <div class="invoice-line"><span></span><span></span></div>
-      <div class="invoice-line"><span></span><span></span></div>
-      <div class="invoice-line"><span></span><span></span></div>
-      <div class="invoice-total">
-        <span>Total</span>
-        <strong>₡ 245.000,00</strong>
-      </div>
-    </div>
-
-    <footer class="brand-footer">© 2026 PropTech Propi · Sistema de Facturación</footer>
-  </section>
+    <p class="brand-footer">© 2026 PropTech Propi · Sistema de facturación</p>
+  </aside>
 
   <!-- Formulario -->
   <section class="form-panel">
     <div class="form-card">
       <div class="mobile-brand">
-        <div class="brand-logo small">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"
-            stroke-linecap="round" stroke-linejoin="round">
+        <span class="brand-mark">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
             <path d="M14 2v6h6" />
             <path d="M8 13h8M8 17h5" />
           </svg>
-        </div>
+        </span>
         <span class="brand-name">PropTech Propi</span>
       </div>
 
       <header class="form-header">
         <h1>Iniciar sesión</h1>
-        <p>Ingresa tus credenciales para acceder al sistema.</p>
+        <p>Ingresa con tu usuario del sistema de facturación.</p>
       </header>
 
-      <form (ngSubmit)="onLogin()" #loginForm="ngForm" novalidate>
+      <form (ngSubmit)="onLogin()" novalidate>
         <div class="field">
           <label for="username">Usuario</label>
-          <div class="input-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
-              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 21a8 8 0 0 1 16 0" />
-            </svg>
-            <input
-              id="username"
-              name="username"
-              type="text"
-              placeholder="Tu nombre de usuario"
-              autocomplete="username"
-              required
-              [(ngModel)]="credentials.username"
-            />
-          </div>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            placeholder="nombre.usuario"
+            autocomplete="username"
+            autofocus
+            required
+            [(ngModel)]="credentials.username"
+            [attr.aria-invalid]="errorMessage ? true : null"
+          />
         </div>
 
         <div class="field">
           <label for="password">Contraseña</label>
           <div class="input-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
-              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="4" y="11" width="16" height="10" rx="2" />
-              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-            </svg>
             <input
-              #pwd
               id="password"
               name="password"
-              type="password"
-              placeholder="••••••••"
+              [type]="showPassword() ? 'text' : 'password'"
+              placeholder="Tu contraseña"
               autocomplete="current-password"
               required
               [(ngModel)]="credentials.password"
+              [attr.aria-invalid]="errorMessage ? true : null"
             />
             <button
               type="button"
               class="toggle-pwd"
-              [attr.aria-label]="pwd.type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña'"
-              (click)="pwd.type = pwd.type === 'password' ? 'text' : 'password'"
+              [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-pressed]="showPassword()"
+              (click)="showPassword.set(!showPassword())"
             >
-              @if (pwd.type === 'password') {
+              @if (!showPassword()) {
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"
-                  stroke-linecap="round" stroke-linejoin="round">
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
                   <circle cx="12" cy="12" r="3" />
                 </svg>
               } @else {
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"
-                  stroke-linecap="round" stroke-linejoin="round">
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M3 3l18 18" />
                   <path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6" />
                   <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
@@ -117,14 +119,6 @@
               }
             </button>
           </div>
-        </div>
-
-        <div class="form-options">
-          <label class="remember">
-            <input type="checkbox" name="remember" />
-            <span>Recordarme</span>
-          </label>
-          <a href="#" class="link" (click)="$event.preventDefault()">¿Olvidaste tu contraseña?</a>
         </div>
 
         @if (errorMessage) {
@@ -141,17 +135,30 @@
         <button
           type="submit"
           class="btn-primary"
-          [disabled]="!credentials.username || !credentials.password"
+          [disabled]="loading() || !credentials.username || !credentials.password"
         >
-          Ingresar
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
+          @if (loading()) {
+            <span class="spinner" aria-hidden="true"></span>
+            Verificando…
+          } @else {
+            Ingresar al sistema
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          }
         </button>
       </form>
 
-      <p class="form-footer">¿Problemas para acceder? Contacta al administrador del sistema.</p>
+      <p class="form-footer">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4" y="11" width="16" height="10" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+        Cada ingreso y salida queda registrado en la bitácora de acceso.
+        ¿Sin acceso? Contacta al administrador.
+      </p>
     </div>
   </section>
 </main>

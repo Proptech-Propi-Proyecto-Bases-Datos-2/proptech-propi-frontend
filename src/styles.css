@@ -1,1 +1,67 @@
-/* You can add global styles to this file, and also import other style files */
+/* ---------- Tokens del sistema (compartidos por todos los componentes) ---------- */
+:root {
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --ink: #0e1726;
+  --ink-2: #1b2638;
+  --text: #111827;
+  --muted: #5b6474;
+  --subtle: #8a93a3;
+  --border: #e4e7ec;
+  --border-strong: #cfd4dc;
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+
+  --accent: #0d7c66;
+  --accent-hover: #0a6553;
+  --accent-soft: #e3f3ef;
+  --accent-ring: rgba(13, 124, 102, 0.22);
+
+  --danger: #c4320a;
+  --danger-soft: #fef3f2;
+  --danger-border: #fecdca;
+
+  --radius-sm: 8px;
+  --radius: 10px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 8px 24px rgba(16, 24, 40, 0.08);
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  min-height: 100dvh;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
