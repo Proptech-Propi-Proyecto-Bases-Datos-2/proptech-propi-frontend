@@ -1,1 +1,94 @@
-<p>tipo-impuesto works!</p>
+<section class="crud-header">
+  <div>
+    <h1>Tipos de impuesto</h1>
+    <p>Catálogo de impuestos que se aplican a los productos y servicios.</p>
+  </div>
+  <div class="toolbar">
+    <button type="button" class="btn btn-primary" (click)="openCreate()">+ Nuevo impuesto</button>
+  </div>
+</section>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+}
+@if (successMessage()) {
+  <div class="alert alert-success">{{ successMessage() }}</div>
+}
+
+<div class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Tarifa</th>
+        <th>Descripción</th>
+        <th class="num">Porcentaje</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (t of taxes(); track t.idImpuesto) {
+        <tr>
+          <td>{{ t.idImpuesto }}</td>
+          <td>{{ t.tarifa }}</td>
+          <td>{{ t.descripcion }}</td>
+          <td class="num">{{ t.porcentaje | number: '1.2-2' }} %</td>
+          <td>
+            <span class="badge" [class.badge-on]="t.estado === 'A'" [class.badge-off]="t.estado !== 'A'">
+              {{ t.estado === 'A' ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button type="button" class="btn btn-sm" (click)="openEdit(t)">Editar</button>
+            @if (t.estado === 'A') {
+              <button type="button" class="btn btn-sm btn-danger" (click)="deactivate(t)">Inactivar</button>
+            }
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="empty">{{ loading() ? 'Cargando…' : 'No hay tipos de impuesto registrados.' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- Cuadro para insertar o editar -->
+@if (showForm()) {
+  <div class="modal-backdrop">
+    <form class="modal" (ngSubmit)="save()">
+      <div class="modal-header">
+        <h2>{{ isEditing() ? 'Editar impuesto #' + form.idImpuesto : 'Nuevo tipo de impuesto' }}</h2>
+        <button type="button" class="close" (click)="closeForm()" aria-label="Cerrar">×</button>
+      </div>
+
+      <div class="modal-body">
+        @if (formError()) {
+          <div class="alert alert-error">{{ formError() }}</div>
+        }
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="tarifa">Tarifa (código)</label>
+            <input id="tarifa" name="tarifa" [(ngModel)]="form.tarifa" required maxlength="10" placeholder="08" />
+          </div>
+          <div class="field">
+            <label for="porcentaje">Porcentaje</label>
+            <input id="porcentaje" name="porcentaje" type="number" min="0" max="100" step="0.01" [(ngModel)]="form.porcentaje" required />
+          </div>
+          <div class="field full">
+            <label for="descripcion">Descripción</label>
+            <input id="descripcion" name="descripcion" [(ngModel)]="form.descripcion" required maxlength="100" placeholder="Tarifa general 13%" />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn" (click)="closeForm()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar' }}</button>
+      </div>
+    </form>
+  </div>
+}

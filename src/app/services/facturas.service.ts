@@ -31,6 +31,13 @@ export class FacturasService {
       .pipe(catchError(this.manejarError));
   }
 
+  // Inserta el encabezado con el SP InsertarFactura y devuelve el id generado.
+  insertarFactura(value: Factura): Observable<{ mensaje: string; idFactura: number }> {
+    return this.http
+      .post<{ mensaje: string; idFactura: number }>(`${this.apiUrl}/insertarFactura`, value)
+      .pipe(catchError(this.manejarError));
+  }
+
   update(id: number, value: Factura): Observable<Factura> {
     return this.http
       .put<Factura>(`${this.apiUrl}/${id}`, value)

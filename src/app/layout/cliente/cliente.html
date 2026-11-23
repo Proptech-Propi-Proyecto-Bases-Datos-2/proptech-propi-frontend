@@ -1,1 +1,159 @@
-<p>cliente works!</p>
+<section class="crud-header">
+  <div>
+    <h1>Clientes</h1>
+    <p>La identificación, el correo y el teléfono se guardan cifrados y aquí se muestran descifrados.</p>
+  </div>
+  <div class="toolbar">
+    <select class="inline-input" [(ngModel)]="stateFilter" (change)="loadClients()" aria-label="Filtrar por estado">
+      <option value="">Todos</option>
+      <option value="A">Activos</option>
+      <option value="I">Inactivos</option>
+    </select>
+    <button type="button" class="btn btn-primary" (click)="openCreate()">+ Nuevo cliente</button>
+  </div>
+</section>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+}
+@if (successMessage()) {
+  <div class="alert alert-success">{{ successMessage() }}</div>
+}
+
+<div class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Tipo ID</th>
+        <th>Identificación</th>
+        <th>Correo</th>
+        <th>Teléfono</th>
+        <th>Provincia</th>
+        <th>Actividad económica</th>
+        <th>Registro</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (c of clients(); track c.idCliente) {
+        <tr>
+          <td>{{ c.idCliente }}</td>
+          <td>{{ c.nombre }}</td>
+          <td>{{ c.tipoIdentificacion }}</td>
+          <td>{{ c.numIdentificacion }}</td>
+          <td>{{ c.correoElectronico }}</td>
+          <td>{{ c.telefono }}</td>
+          <td>{{ c.provincia }}</td>
+          <td>{{ c.actividadEconomica }}</td>
+          <td>{{ c.fechaRegistro | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <span class="badge" [class.badge-on]="c.estado === 'A'" [class.badge-off]="c.estado !== 'A'">
+              {{ c.estado === 'A' ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button type="button" class="btn btn-sm" (click)="openEdit(c)">Editar</button>
+            @if (c.estado === 'A') {
+              <button type="button" class="btn btn-sm btn-danger" (click)="deactivate(c)">Inactivar</button>
+            }
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="11" class="empty">{{ loading() ? 'Cargando…' : 'No hay clientes para mostrar.' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- Cuadro para insertar o editar -->
+@if (showForm()) {
+  <div class="modal-backdrop">
+    <form class="modal" (ngSubmit)="save()">
+      <div class="modal-header">
+        <h2>{{ isEditing() ? 'Editar cliente #' + form.idCliente : 'Nuevo cliente' }}</h2>
+        <button type="button" class="close" (click)="closeForm()" aria-label="Cerrar">×</button>
+      </div>
+
+      <div class="modal-body">
+        @if (formError()) {
+          <div class="alert alert-error">{{ formError() }}</div>
+        }
+
+        <div class="form-grid">
+          <div class="field full">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" [(ngModel)]="form.nombre" required maxlength="150" />
+          </div>
+          <div class="field">
+            <label for="tipoIdentificacion">Tipo de identificación</label>
+            <select id="tipoIdentificacion" name="tipoIdentificacion" [(ngModel)]="form.tipoIdentificacion" required>
+              <option value="Física">Física</option>
+              <option value="Jurídica">Jurídica</option>
+              <option value="DIMEX">DIMEX</option>
+              <option value="NITE">NITE</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="numIdentificacion">Número de identificación</label>
+            <input id="numIdentificacion" name="numIdentificacion" [(ngModel)]="form.numIdentificacion" required maxlength="50" />
+          </div>
+          <div class="field">
+            <label for="correoElectronico">Correo electrónico</label>
+            <input id="correoElectronico" name="correoElectronico" type="email" [(ngModel)]="form.correoElectronico" required maxlength="256" />
+          </div>
+          <div class="field">
+            <label for="telefono">Teléfono</label>
+            <input id="telefono" name="telefono" [(ngModel)]="form.telefono" required maxlength="20" placeholder="8888-8888" />
+          </div>
+          <div class="field">
+            <label for="provincia">Provincia</label>
+            <input id="provincia" name="provincia" [(ngModel)]="form.provincia" required maxlength="40" />
+          </div>
+          <div class="field">
+            <label for="canton">Cantón</label>
+            <input id="canton" name="canton" [(ngModel)]="form.canton" required maxlength="40" />
+          </div>
+          <div class="field">
+            <label for="distrito">Distrito</label>
+            <input id="distrito" name="distrito" [(ngModel)]="form.distrito" required maxlength="40" />
+          </div>
+          <div class="field">
+            <label for="barrio">Barrio</label>
+            <input id="barrio" name="barrio" [(ngModel)]="form.barrio" required maxlength="40" />
+          </div>
+          <div class="field full">
+            <label for="direccionExacta">Dirección exacta</label>
+            <input id="direccionExacta" name="direccionExacta" [(ngModel)]="form.direccionExacta" maxlength="500" />
+          </div>
+          <div class="field">
+            <label for="profesion">Profesión u oficio</label>
+            <input id="profesion" name="profesion" [(ngModel)]="form.profesion" required maxlength="100" />
+          </div>
+          <div class="field">
+            <label for="actividadEconomica">Actividad económica</label>
+            <input id="actividadEconomica" name="actividadEconomica" [(ngModel)]="form.actividadEconomica" required maxlength="100" />
+          </div>
+          @if (isEditing()) {
+            <div class="field">
+              <label for="estado">Estado</label>
+              <select id="estado" name="estado" [(ngModel)]="form.estado">
+                <option value="A">Activo</option>
+                <option value="I">Inactivo</option>
+              </select>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn" (click)="closeForm()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar' }}</button>
+      </div>
+    </form>
+  </div>
+}

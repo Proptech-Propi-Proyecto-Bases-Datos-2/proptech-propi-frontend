@@ -1,1 +1,112 @@
-<p>nota-credito-debito works!</p>
+<section class="crud-header">
+  <div>
+    <h1>Notas de crédito y débito</h1>
+    <p>Ajustes sobre una factura. Una nota de crédito no puede superar el saldo de la factura.</p>
+  </div>
+  <div class="toolbar">
+    <button type="button" class="btn btn-primary" (click)="openCreate()">+ Nueva nota</button>
+  </div>
+</section>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+}
+@if (successMessage()) {
+  <div class="alert alert-success">{{ successMessage() }}</div>
+}
+
+<div class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Fecha</th>
+        <th>Factura</th>
+        <th>Cliente</th>
+        <th>Tipo</th>
+        <th>Motivo</th>
+        <th class="num">Monto</th>
+        <th class="num">Total factura</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of rows(); track r.note.idNota) {
+        <tr>
+          <td>{{ r.note.idNota }}</td>
+          <td>{{ r.note.fecha | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>#{{ r.idFactura }}</td>
+          <td>{{ r.clientName }}</td>
+          <td>
+            <span class="badge" [class.badge-on]="r.note.tipo === 'Debito'" [class.badge-off]="r.note.tipo === 'Credito'">
+              {{ r.note.tipo === 'Credito' ? 'Crédito' : 'Débito' }}
+            </span>
+          </td>
+          <td>{{ r.note.motivo }}</td>
+          <td class="num">{{ r.note.montoTotal | number: '1.2-2' }}</td>
+          <td class="num">{{ r.invoiceTotal | number: '1.2-2' }}</td>
+          <td class="actions">
+            <button type="button" class="btn btn-sm" (click)="openEdit(r)">Editar</button>
+            <button type="button" class="btn btn-sm btn-danger" (click)="remove(r)">Eliminar</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="9" class="empty">{{ loading() ? 'Cargando…' : 'No hay notas registradas.' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- Cuadro para insertar o editar -->
+@if (showForm()) {
+  <div class="modal-backdrop">
+    <form class="modal" (ngSubmit)="save()">
+      <div class="modal-header">
+        <h2>{{ isEditing() ? 'Editar nota #' + form.idNota : 'Nueva nota de crédito o débito' }}</h2>
+        <button type="button" class="close" (click)="closeForm()" aria-label="Cerrar">×</button>
+      </div>
+
+      <div class="modal-body">
+        @if (formError()) {
+          <div class="alert alert-error">{{ formError() }}</div>
+        }
+
+        <div class="form-grid">
+          <div class="field full">
+            <label for="factura">Factura</label>
+            <select id="factura" name="factura" [(ngModel)]="formInvoiceId" [disabled]="isEditing()" required>
+              <option [ngValue]="0" disabled>Seleccione una factura…</option>
+              @for (f of invoices(); track f.idFactura) {
+                <option [ngValue]="f.idFactura">
+                  Factura #{{ f.idFactura }} – {{ f.cliente.nombre }} (total {{ f.montoTotal | number: '1.2-2' }})
+                </option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="tipo">Tipo</label>
+            <select id="tipo" name="tipo" [(ngModel)]="form.tipo">
+              <option value="Credito">Crédito</option>
+              <option value="Debito">Débito</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="montoTotal">Monto</label>
+            <input id="montoTotal" name="montoTotal" type="number" min="0.01" step="0.01" [(ngModel)]="form.montoTotal" required />
+          </div>
+          <div class="field full">
+            <label for="motivo">Motivo</label>
+            <input id="motivo" name="motivo" [(ngModel)]="form.motivo" maxlength="255" placeholder="Devolución, descuento, recargo…" />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn" (click)="closeForm()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar' }}</button>
+      </div>
+    </form>
+  </div>
+}

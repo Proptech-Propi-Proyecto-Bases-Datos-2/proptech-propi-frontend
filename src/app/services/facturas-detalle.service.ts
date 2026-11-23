@@ -31,6 +31,13 @@ export class FacturasDetalleService {
       .pipe(catchError(this.manejarError));
   }
 
+  // Inserta una línea con el SP InsertarFacturaDetalle.
+  insertarDetalle(value: FacturaDetalle): Observable<void> {
+    return this.http
+      .post<void>(`${this.apiUrl}/insertarDetalle`, value)
+      .pipe(catchError(this.manejarError));
+  }
+
   update(id: number, value: FacturaDetalle): Observable<FacturaDetalle> {
     return this.http
       .put<FacturaDetalle>(`${this.apiUrl}/${id}`, value)

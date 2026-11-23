@@ -1,1 +1,112 @@
-<p>factura-detalle works!</p>
+<section class="crud-header">
+  <div>
+    <h1>Factura detalle</h1>
+    <p>Líneas de cada factura. Al agregar, editar o eliminar una línea se recalculan los totales de la factura.</p>
+  </div>
+  <div class="toolbar">
+    <select class="inline-input" [(ngModel)]="invoiceFilter" aria-label="Filtrar por factura">
+      <option [ngValue]="0">Todas las facturas</option>
+      @for (f of invoices(); track f.idFactura) {
+        <option [ngValue]="f.idFactura">Factura #{{ f.idFactura }} – {{ f.cliente.nombre }}</option>
+      }
+    </select>
+    <button type="button" class="btn btn-primary" (click)="openCreate()">+ Nueva línea</button>
+  </div>
+</section>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+}
+@if (successMessage()) {
+  <div class="alert alert-success">{{ successMessage() }}</div>
+}
+
+<div class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>ID línea</th>
+        <th>Factura</th>
+        <th>Cliente</th>
+        <th>Producto o servicio</th>
+        <th class="num">Precio</th>
+        <th class="num">Cantidad</th>
+        <th class="num">Monto línea</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of filteredRows; track r.detail.idDetalle) {
+        <tr>
+          <td>{{ r.detail.idDetalle }}</td>
+          <td>#{{ r.idFactura }}</td>
+          <td>{{ r.clientName }}</td>
+          <td>{{ r.detail.productoServicio.descripcion }}</td>
+          <td class="num">{{ r.detail.productoServicio.precio | number: '1.2-2' }}</td>
+          <td class="num">{{ r.detail.cantidad }}</td>
+          <td class="num">{{ r.detail.montoLinea | number: '1.2-2' }}</td>
+          <td class="actions">
+            <button type="button" class="btn btn-sm" (click)="openEdit(r)">Editar</button>
+            <button type="button" class="btn btn-sm btn-danger" (click)="remove(r)">Eliminar</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="8" class="empty">{{ loading() ? 'Cargando…' : 'No hay líneas de factura para mostrar.' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- Cuadro para insertar o editar -->
+@if (showForm()) {
+  <div class="modal-backdrop">
+    <form class="modal" (ngSubmit)="save()">
+      <div class="modal-header">
+        <h2>{{ isEditing() ? 'Editar línea #' + form.idDetalle : 'Nueva línea de factura' }}</h2>
+        <button type="button" class="close" (click)="closeForm()" aria-label="Cerrar">×</button>
+      </div>
+
+      <div class="modal-body">
+        @if (formError()) {
+          <div class="alert alert-error">{{ formError() }}</div>
+        }
+
+        <div class="form-grid">
+          <div class="field full">
+            <label for="factura">Factura</label>
+            <select id="factura" name="factura" [(ngModel)]="formInvoiceId" [disabled]="isEditing()" required>
+              <option [ngValue]="0" disabled>Seleccione una factura…</option>
+              @for (f of invoices(); track f.idFactura) {
+                <option [ngValue]="f.idFactura">Factura #{{ f.idFactura }} – {{ f.cliente.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="field full">
+            <label for="producto">Producto o servicio</label>
+            <select id="producto" name="producto" [(ngModel)]="form.productoServicio.idProducto" required>
+              <option [ngValue]="0" disabled>Seleccione…</option>
+              @for (p of availableProducts; track p.idProducto) {
+                <option [ngValue]="p.idProducto">{{ p.descripcion }} (₡{{ p.precio | number: '1.2-2' }})</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="cantidad">Cantidad</label>
+            <input id="cantidad" name="cantidad" type="number" min="1" step="1" [(ngModel)]="form.cantidad" required />
+          </div>
+          <div class="field">
+            <label for="montoLinea">Monto de la línea (cantidad × precio)</label>
+            <input id="montoLinea" name="montoLinea" [value]="lineAmount | number: '1.2-2'" disabled />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn" (click)="closeForm()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar' }}</button>
+      </div>
+    </form>
+  </div>
+}
