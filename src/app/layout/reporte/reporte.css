@@ -1,0 +1,81 @@
+/* Botones para escoger el reporte */
+.report-tabs {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  height: 36px;
+  padding: 0 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+/* Fila de filtros */
+.filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.filters .field {
+  min-width: 180px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.result-count {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* Fila de totales del reporte de facturas */
+tfoot td {
+  border-top: 2px solid var(--border-strong);
+  background: var(--bg);
+}
+
+/* Columna de datos afectados de la auditoría: el JSON se parte en varias líneas */
+.data-cell {
+  min-width: 360px;
+  max-width: 560px;
+  white-space: normal;
+  word-break: break-word;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* Etiqueta amarilla para las modificaciones */
+.badge-mod {
+  background: #fef6e0;
+  color: #9a6700;
+}

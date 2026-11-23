@@ -1,0 +1,226 @@
+<section class="crud-header">
+  <div>
+    <h1>Reportes</h1>
+    <p>Los 4 reportes del sistema. Cada uno se genera con su procedimiento almacenado en SQL Server.</p>
+  </div>
+</section>
+
+<!-- Botones para escoger el reporte -->
+<nav class="report-tabs" aria-label="Tipo de reporte">
+  @for (tab of reportTabs; track tab.id) {
+    <button type="button" class="tab" [class.active]="activeReport() === tab.id" (click)="selectReport(tab.id)">
+      {{ tab.label }}
+    </button>
+  }
+</nav>
+
+<!-- Filtros del reporte escogido -->
+<form class="filters" (ngSubmit)="generate()">
+  @if (activeReport() !== 'seguridad') {
+    <div class="field">
+      <label for="dateFrom">Fecha desde</label>
+      <input id="dateFrom" name="dateFrom" type="date" [(ngModel)]="dateFrom" required />
+    </div>
+    <div class="field">
+      <label for="dateTo">Fecha hasta</label>
+      <input id="dateTo" name="dateTo" type="date" [(ngModel)]="dateTo" required />
+    </div>
+  }
+
+  @if (activeReport() === 'clientes') {
+    <div class="field">
+      <label for="clientState">Estado</label>
+      <select id="clientState" name="clientState" [(ngModel)]="clientState">
+        <option value="T">Todos</option>
+        <option value="A">Activos</option>
+        <option value="I">Inactivos</option>
+      </select>
+    </div>
+  }
+
+  @if (activeReport() === 'auditoria') {
+    <div class="field">
+      <label for="auditUser">Usuario (login)</label>
+      <select id="auditUser" name="auditUser" [(ngModel)]="auditUser">
+        <option value="">Todos</option>
+        @for (u of auditUsers; track u) {
+          <option [value]="u">{{ u }}</option>
+        }
+      </select>
+    </div>
+  }
+
+  @if (activeReport() === 'seguridad') {
+    <div class="field">
+      <label for="securityUser">Usuario de base de datos</label>
+      <select id="securityUser" name="securityUser" [(ngModel)]="securityUser">
+        <option value="">Todos</option>
+        @for (u of securityUsers; track u) {
+          <option [value]="u">{{ u }}</option>
+        }
+      </select>
+    </div>
+  }
+
+  <div class="filter-actions">
+    <button type="submit" class="btn btn-primary" [disabled]="loading()">
+      {{ loading() ? 'Generando…' : 'Generar reporte' }}
+    </button>
+    @if (generated() && rowCount > 0) {
+      <button type="button" class="btn" (click)="exportCsv()">Exportar a Excel (CSV)</button>
+    }
+  </div>
+</form>
+
+@if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+}
+
+@if (generated()) {
+  <p class="result-count">{{ rowCount }} {{ rowCount === 1 ? 'resultado' : 'resultados' }}</p>
+
+  <div class="table-card">
+    @switch (activeReport()) {
+      <!-- Reporte 1: Clientes resumido -->
+      @case ('clientes') {
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Identificación</th>
+              <th>Actividad económica</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of clients(); track $index) {
+              <tr>
+                <td>{{ c.nombre }}</td>
+                <td>{{ c.numIdentificacion }}</td>
+                <td>{{ c.actividadEconomica }}</td>
+                <td>{{ c.correoElectronico }}</td>
+                <td>{{ c.telefono }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="5" class="empty">No hay clientes con esos filtros.</td></tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      <!-- Reporte 2: Facturas -->
+      @case ('facturas') {
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Identificación</th>
+              <th>Actividad económica</th>
+              <th class="num">N.º factura</th>
+              <th>Fecha</th>
+              <th class="num">Subtotal</th>
+              <th class="num">Impuestos</th>
+              <th class="num">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (f of invoices(); track f.numeroFactura) {
+              <tr>
+                <td>{{ f.nombreCliente }}</td>
+                <td>{{ f.numIdentificacion }}</td>
+                <td>{{ f.actividadEconomica }}</td>
+                <td class="num">{{ f.numeroFactura }}</td>
+                <td>{{ f.fechaFactura | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td class="num">{{ f.subtotal | number: '1.2-2' }}</td>
+                <td class="num">{{ f.totalImpuestos | number: '1.2-2' }}</td>
+                <td class="num"><strong>{{ f.montoTotal | number: '1.2-2' }}</strong></td>
+              </tr>
+            } @empty {
+              <tr><td colspan="8" class="empty">No hay facturas en ese rango de fechas.</td></tr>
+            }
+          </tbody>
+          @if (invoices().length > 0) {
+            <tfoot>
+              <tr>
+                <td colspan="5"><strong>Totales</strong></td>
+                <td class="num"><strong>{{ invoiceTotals().subtotal | number: '1.2-2' }}</strong></td>
+                <td class="num"><strong>{{ invoiceTotals().taxes | number: '1.2-2' }}</strong></td>
+                <td class="num"><strong>{{ invoiceTotals().total | number: '1.2-2' }}</strong></td>
+              </tr>
+            </tfoot>
+          }
+        </table>
+      }
+
+      <!-- Reporte 3: Pistas de auditoría -->
+      @case ('auditoria') {
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Acción</th>
+              <th>Usuario</th>
+              <th>Tabla afectada</th>
+              <th>Llave</th>
+              <th>Datos afectados (antes / después)</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of audits(); track $index) {
+              <tr>
+                <td>{{ a.fecRegistro | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+                <td>
+                  <span class="badge" [class.badge-on]="a.accion === 'Inserción'"
+                    [class.badge-off]="a.accion === 'Borrado'" [class.badge-mod]="a.accion === 'Modificación'">
+                    {{ a.accion }}
+                  </span>
+                </td>
+                <td>{{ a.nombreUsuario }}</td>
+                <td>{{ a.tablaAfectada }}</td>
+                <td>{{ a.llaveRegistro }}</td>
+                <td class="data-cell">{{ a.datosAfectados }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="empty">No hay movimientos con esos filtros.</td></tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      <!-- Reporte 4: Configuración de seguridad -->
+      @case ('seguridad') {
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Objeto</th>
+              <th>Tipo de objeto</th>
+              <th>Permiso</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of permissions(); track $index) {
+              <tr>
+                <td>{{ p.nombreUsuario }}</td>
+                <td>{{ p.rol }}</td>
+                <td>{{ p.nombreObjeto }}</td>
+                <td>{{ p.tipoObjeto }}</td>
+                <td>{{ p.tipoPermiso }}</td>
+                <td>
+                  <span class="badge" [class.badge-on]="p.estadoPermiso === 'GRANT'" [class.badge-off]="p.estadoPermiso === 'DENY'">
+                    {{ p.estadoPermiso }}
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="empty">No hay permisos para ese usuario.</td></tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  </div>
+}

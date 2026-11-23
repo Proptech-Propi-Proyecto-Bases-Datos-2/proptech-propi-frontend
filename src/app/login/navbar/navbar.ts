@@ -63,6 +63,12 @@ export class NavbarComponent {
       title: 'Clientes',
       icon: ['M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8', 'M4 21a8 8 0 0 1 16 0'],
     },
+    {
+      path: '/layout/reportes',
+      label: 'Reportes',
+      title: 'Reportes',
+      icon: ['M4 20h16', 'M7 16V10', 'M12 16V5', 'M17 16v-8'],
+    },
   ];
 
   constructor(public authService: AuthService, private router: Router) {}
