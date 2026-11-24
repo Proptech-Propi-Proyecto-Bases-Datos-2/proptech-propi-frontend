@@ -239,24 +239,6 @@ export class Factura implements OnInit {
     });
   }
 
-  // ---------- Eliminar ----------
-  // Borra la factura junto con sus líneas y notas
-  remove(invoice: FacturaModel): void {
-    if (!invoice.idFactura) return;
-    const message = `¿Desea eliminar la factura #${invoice.idFactura}? También se eliminan sus líneas y notas.`;
-    if (!confirm(message)) return;
-
-    this.errorMessage.set('');
-    this.successMessage.set('');
-    this.facturasService.delete(invoice.idFactura).subscribe({
-      next: () => {
-        this.successMessage.set(`Factura #${invoice.idFactura} eliminada correctamente.`);
-        this.loadInvoices();
-      },
-      error: (err: ApiError) => this.errorMessage.set(err.mensaje),
-    });
-  }
-
   private afterSave(message: string): void {
     this.saving.set(false);
     this.showForm.set(false);

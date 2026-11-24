@@ -130,22 +130,6 @@ export class NotaCreditoDebito implements OnInit {
     }
   }
 
-  // Eliminar es un borrado físico de la nota
-  remove(row: NoteRow): void {
-    if (!row.note.idNota) return;
-    if (!confirm(`¿Desea eliminar la nota #${row.note.idNota} de la factura #${row.idFactura}?`)) return;
-
-    this.errorMessage.set('');
-    this.successMessage.set('');
-    this.notasService.delete(row.note.idNota).subscribe({
-      next: () => {
-        this.successMessage.set('Nota eliminada correctamente.');
-        this.loadRows();
-      },
-      error: (err: ApiError) => this.errorMessage.set(err.mensaje),
-    });
-  }
-
   private afterSave(message: string): void {
     this.saving.set(false);
     this.showForm.set(false);

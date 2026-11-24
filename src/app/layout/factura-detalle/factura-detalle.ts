@@ -157,19 +157,6 @@ export class FacturaDetalle implements OnInit {
     }
   }
 
-  // Eliminar es un borrado físico de la línea
-  remove(row: DetailRow): void {
-    if (!row.detail.idDetalle) return;
-    if (!confirm(`¿Desea eliminar la línea #${row.detail.idDetalle} de la factura #${row.idFactura}?`)) return;
-
-    this.errorMessage.set('');
-    this.successMessage.set('');
-    this.detalleService.delete(row.detail.idDetalle).subscribe({
-      next: () => this.afterChange(row.idFactura, 'Línea eliminada correctamente.'),
-      error: (err: ApiError) => this.errorMessage.set(err.mensaje),
-    });
-  }
-
   // Después de cambiar una línea se recalculan los totales de su factura
   private afterChange(idFactura: number, message: string): void {
     this.saving.set(false);
