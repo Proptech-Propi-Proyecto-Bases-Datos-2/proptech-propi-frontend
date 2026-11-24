@@ -15,6 +15,8 @@ export class Cliente implements OnInit {
   // Angular 22 usa OnPush por defecto: lo que cambia con las respuestas del backend va en signals
   readonly clients = signal<ClienteModel[]>([]);
   readonly loading = signal(false);
+  // true cuando la API responde 403: el rol del usuario no puede ver esta lista
+  readonly sinPermiso = signal(false);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -38,6 +40,7 @@ export class Cliente implements OnInit {
   // Trae los clientes del backend (ya vienen descifrados por el SP ConsultarClientes)
   loadClients(): void {
     this.loading.set(true);
+    this.sinPermiso.set(false);
     this.errorMessage.set('');
     this.clientesService.listarClientes(this.stateFilter).subscribe({
       next: (data) => {
@@ -47,6 +50,7 @@ export class Cliente implements OnInit {
       error: (err: ApiError) => {
         this.errorMessage.set(err.mensaje);
         this.loading.set(false);
+        this.sinPermiso.set(err.status === 403);
       },
     });
   }

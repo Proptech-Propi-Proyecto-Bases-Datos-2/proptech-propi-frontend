@@ -27,7 +27,6 @@ export class Login {
       next: (res) => {
         // Éxito
         this.loading.set(false);
-        this.authService.guardarSesion(res.username, res.idBitacora);
         this.router.navigate(['/layout']);
       },
       error: (err) => {

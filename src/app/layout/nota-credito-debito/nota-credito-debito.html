@@ -52,7 +52,7 @@
         </tr>
       } @empty {
         <tr>
-          <td colspan="9" class="empty">{{ loading() ? 'Cargando…' : 'No hay notas registradas.' }}</td>
+          <td colspan="9" class="empty">{{ loading() ? 'Cargando…' : sinPermiso() ? 'Su rol no tiene permiso para ver esta información.' : 'No hay notas registradas.' }}</td>
         </tr>
       }
     </tbody>

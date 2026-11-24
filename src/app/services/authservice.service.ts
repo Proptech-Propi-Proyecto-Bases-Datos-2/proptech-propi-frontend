@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, finalize, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AuthResponse } from '../models/AuthResponse';
+import { AuthResponse, Rol } from '../models/AuthResponse';
 import { LoginCredentials } from '../models/LoginCredentials';
 
 @Injectable({
@@ -10,23 +10,19 @@ import { LoginCredentials } from '../models/LoginCredentials';
 })
 export class AuthService {
   private apiUrl = `${environment.API_URL}auth`;
-    
+
   constructor(private http: HttpClient) {}
 
   login(credentials: LoginCredentials): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap((response) => {
-        // Guardar identificadores de la sesión en LocalStorage
+        // Guardar la sesión en LocalStorage (nunca la contraseña)
         localStorage.setItem('username', response.username);
-        localStorage.setItem('password', credentials.password);
+        localStorage.setItem('rol', response.rol);
+        localStorage.setItem('token', response.token);
         localStorage.setItem('id_bitacora', response.idBitacora.toString());
       })
     );
-  }
-
-  guardarSesion(username: string, idBitacora: number): void {
-    localStorage.setItem('username', username);
-    localStorage.setItem('id_bitacora', idBitacora.toString());
   }
 
   // Método complementario para obtener el usuario activo
@@ -34,28 +30,31 @@ export class AuthService {
     return localStorage.getItem('username');
   }
 
+  obtenerRol(): Rol | null {
+    return localStorage.getItem('rol') as Rol | null;
+  }
+
+  obtenerToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  // El token viaja en el encabezado Authorization (lo agrega authInterceptor)
   logout(): Observable<any> {
-    const username = localStorage.getItem('username');
-    const password = localStorage.getItem('password');
-    const idBitacora = Number(localStorage.getItem('id_bitacora'));
-
-    const payload = {
-      idBitacora: idBitacora,
-      username: username,
-      password: password
-    };
-
-    return this.http.post(`${this.apiUrl}/logout`, payload).pipe(
-      tap(() => {
-        // Limpiar la sesión en el navegador tras registrar la salida
-        localStorage.removeItem('username');
-        localStorage.removeItem('password');
-        localStorage.removeItem('id_bitacora');
-      })
+    return this.http.post(`${this.apiUrl}/logout`, {}).pipe(
+      // Limpiar la sesión en el navegador aunque falle el registro de salida
+      finalize(() => this.limpiarSesion())
     );
   }
 
+  limpiarSesion(): void {
+    localStorage.removeItem('username');
+    localStorage.removeItem('rol');
+    localStorage.removeItem('token');
+    localStorage.removeItem('id_bitacora');
+    localStorage.removeItem('password'); // por si quedó de una versión anterior
+  }
+
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('id_bitacora');
+    return !!localStorage.getItem('token') && !!localStorage.getItem('rol');
   }
 }
