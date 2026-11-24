@@ -44,12 +44,6 @@ export class NotasCreditoDebitoService {
       .pipe(catchError(this.manejarError));
   }
 
-  delete(id: number): Observable<void> {
-    return this.http
-      .delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.manejarError));
-  }
-
   // Convierte la respuesta de error del backend ({ "error": "..." }) en un ApiError.
   private manejarError = (error: HttpErrorResponse): Observable<never> => {
     let mensaje: string;

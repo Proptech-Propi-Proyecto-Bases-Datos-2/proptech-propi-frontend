@@ -1,7 +1,7 @@
 <section class="crud-header">
   <div>
     <h1>Factura detalle</h1>
-    <p>Líneas de cada factura. Al agregar, editar o eliminar una línea se recalculan los totales de la factura.</p>
+    <p>Líneas de cada factura. Al agregar o editar una línea se recalculan los totales de la factura.</p>
   </div>
   <div class="toolbar">
     <select class="inline-input" [(ngModel)]="invoiceFilter" aria-label="Filtrar por factura">
@@ -47,7 +47,6 @@
           <td class="num">{{ r.detail.montoLinea | number: '1.2-2' }}</td>
           <td class="actions">
             <button type="button" class="btn btn-sm" (click)="openEdit(r)">Editar</button>
-            <button type="button" class="btn btn-sm btn-danger" (click)="remove(r)">Eliminar</button>
           </td>
         </tr>
       } @empty {
