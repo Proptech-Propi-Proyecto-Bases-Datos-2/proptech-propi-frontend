@@ -28,6 +28,8 @@ export class FacturaDetalle implements OnInit {
   readonly invoices = signal<Factura[]>([]);
   readonly products = signal<ProductoServicio[]>([]);
   readonly loading = signal(false);
+  // true cuando la API responde 403: el rol del usuario no puede ver esta lista
+  readonly sinPermiso = signal(false);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -60,6 +62,7 @@ export class FacturaDetalle implements OnInit {
   // El backend no devuelve la factura de cada línea, por eso se arma la lista desde las facturas
   loadRows(): void {
     this.loading.set(true);
+    this.sinPermiso.set(false);
     this.facturasService.findAll().subscribe({
       next: (data) => {
         const list: DetailRow[] = [];
@@ -79,6 +82,7 @@ export class FacturaDetalle implements OnInit {
       error: (err: ApiError) => {
         this.errorMessage.set(err.mensaje);
         this.loading.set(false);
+        this.sinPermiso.set(err.status === 403);
       },
     });
   }

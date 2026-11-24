@@ -8,6 +8,7 @@ import { NotaCreditoDebito } from './layout/nota-credito-debito/nota-credito-deb
 import { ProductoServicio } from './layout/producto-servicio/producto-servicio';
 import { TipoImpuesto } from './layout/tipo-impuesto/tipo-impuesto';
 import { Reporte } from './layout/reporte/reporte';
+import { rolGuard } from './services/rol.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -15,6 +16,8 @@ export const routes: Routes = [
   {
     path: 'layout',
     component: Inicio,
+    canActivate: [rolGuard],
+    canActivateChild: [rolGuard],
     children: [
       { path: 'facturas', component: Factura },
       { path: 'factura-detalle', component: FacturaDetalle },

@@ -29,6 +29,8 @@ export class Factura implements OnInit {
   readonly clients = signal<Cliente[]>([]);
   readonly products = signal<ProductoServicio[]>([]);
   readonly loading = signal(false);
+  // true cuando la API responde 403: el rol del usuario no puede ver esta lista
+  readonly sinPermiso = signal(false);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -59,6 +61,7 @@ export class Factura implements OnInit {
 
   loadInvoices(): void {
     this.loading.set(true);
+    this.sinPermiso.set(false);
     this.errorMessage.set('');
     this.facturasService.findAll().subscribe({
       next: (data) => {
@@ -68,6 +71,7 @@ export class Factura implements OnInit {
       error: (err: ApiError) => {
         this.errorMessage.set(err.mensaje);
         this.loading.set(false);
+        this.sinPermiso.set(err.status === 403);
       },
     });
   }

@@ -26,6 +26,8 @@ export class NotaCreditoDebito implements OnInit {
   readonly rows = signal<NoteRow[]>([]);
   readonly invoices = signal<Factura[]>([]);
   readonly loading = signal(false);
+  // true cuando la API responde 403: el rol del usuario no puede ver esta lista
+  readonly sinPermiso = signal(false);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -51,6 +53,7 @@ export class NotaCreditoDebito implements OnInit {
   // El backend no devuelve la factura de cada nota, por eso se arma la lista desde las facturas
   loadRows(): void {
     this.loading.set(true);
+    this.sinPermiso.set(false);
     this.facturasService.findAll().subscribe({
       next: (data) => {
         const list: NoteRow[] = [];
@@ -71,6 +74,7 @@ export class NotaCreditoDebito implements OnInit {
       error: (err: ApiError) => {
         this.errorMessage.set(err.mensaje);
         this.loading.set(false);
+        this.sinPermiso.set(err.status === 403);
       },
     });
   }
